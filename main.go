@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -23,6 +24,7 @@ func main() {
 	go func() {
 		sigint := make(chan os.Signal, 1)
 		signal.Notify(sigint, os.Interrupt)
+		signal.Notify(sigint, syscall.SIGTERM)
 		log.Println(<-sigint)
 		// We received an interrupt signal, shut down.
 		if err := srv.Shutdown(context.Background()); err != nil {
@@ -46,7 +48,6 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func userHandler(w http.ResponseWriter, r *http.Request) {
-	time.Sleep(10 * time.Second)
+	time.Sleep(20 * time.Second)
 	w.Write([]byte("Hello user"))
 }
-
